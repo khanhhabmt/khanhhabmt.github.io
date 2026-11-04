@@ -1,0 +1,59 @@
+# Content Protection .htaccess
+# Note: This won't work on GitHub Pages but useful for other hosting
+
+# Prevent access to sensitive files
+<Files "robots.txt">
+    Order Allow,Deny
+    Allow from all
+</Files>
+
+# Disable directory browsing
+Options -Indexes
+
+# Prevent hot linking of images and media
+RewriteEngine on
+RewriteCond %{HTTP_REFERER} !^$
+RewriteCond %{HTTP_REFERER} !^http(s)?://(www\.)?khanhhabmt.github.io [NC]
+RewriteRule \.(jpg|jpeg|png|gif|svg|mp4|mp3|pdf)$ - [NC,F,L]
+
+# Prevent access to source files
+<FilesMatch "\.(md|yml|yaml|json|ts|js|jsx|tsx)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Security headers
+<IfModule mod_headers.c>
+    # Prevent framing
+    Header always append X-Frame-Options DENY
+    
+    # Content type sniffing prevention
+    Header always set X-Content-Type-Options nosniff
+    
+    # XSS protection
+    Header always set X-XSS-Protection "1; mode=block"
+    
+    # Referrer policy
+    Header always set Referrer-Policy "no-referrer"
+    
+    # Cache control
+    Header always set Cache-Control "no-cache, no-store, must-revalidate"
+    Header always set Pragma "no-cache"
+    Header always set Expires "0"
+    
+    # Remove server information
+    Header unset Server
+    Header unset X-Powered-By
+</IfModule>
+
+# Disable server signature
+ServerSignature Off
+
+# Block common bot user agents
+RewriteEngine On
+RewriteCond %{HTTP_USER_AGENT} (bot|crawler|spider|scraper|extractor) [NC]
+RewriteRule ^(.*)$ - [F,L]
+
+# Block specific bots
+RewriteCond %{HTTP_USER_AGENT} (Googlebot|Bingbot|Slurp|DuckDuckBot|Baiduspider|YandexBot|facebookexternalhit|Twitterbot|LinkedInBot|WhatsApp|ia_archiver|SemrushBot|AhrefsBot|MJ12bot) [NC]
+RewriteRule ^(.*)$ - [F,L] 
